@@ -16,12 +16,39 @@
   * destroy() // prototype method that returns: `${this.name} was removed from the game.`
 */
 
+function GameObject(object) {
+  this.createdAt = object.createdAt;
+  this.name = object.name;
+  this.dimensions = object.dimensions;
+}
+
+GameObject.prototype.destroy = function() {
+  return `${this.name} was removed from the game.`
+}
+
 /*
   === CharacterStats ===
   * healthPoints
   * takeDamage() // prototype method -> returns the string '<object name> took damage.'
   * should inherit destroy() from GameObject's prototype
 */
+
+function CharacterStats(newStats) {
+  GameObject.call(this, newStats);
+  this.healthPoints = newStats.healthPoints;
+}
+
+/* Why did I have to add the line for CharacterStats to inherit from GameObject before
+creating the takeDamage() method in the prototype? When I had the order reversed and I viewed
+the function in the console, the takeDamage() method was not a part of the function. But when I organized
+the lines like I have below, it is there. */
+
+CharacterStats.prototype = Object.create(GameObject.prototype);
+
+CharacterStats.prototype.takeDamage = function() {
+  return `${this.name} took damage.`
+}
+
 
 /*
   === Humanoid (Having an appearance or character resembling that of a human.) ===
@@ -32,6 +59,21 @@
   * should inherit destroy() from GameObject through CharacterStats
   * should inherit takeDamage() from CharacterStats
 */
+
+function Humanoid(character) {
+  CharacterStats.call(this, character);
+  this.team = character.team;
+  this.weapons = character.weapons;
+  this.language = character.language;
+}
+
+Humanoid.prototype = Object.create(CharacterStats.prototype);
+
+
+Humanoid.prototype.greet = function() {
+  return `${this.name} offers a greeting in ${this.language}.`;
+}
+
  
 /*
   * Inheritance chain: GameObject -> CharacterStats -> Humanoid
@@ -41,7 +83,7 @@
 
 // Test you work by un-commenting these 3 objects and the list of console logs below:
 
-/*
+
   const mage = new Humanoid({
     createdAt: new Date(),
     dimensions: {
@@ -92,6 +134,8 @@
     language: 'Elvish',
   });
 
+  console.log(Humanoid.prototype);
+
   console.log(mage.createdAt); // Today's date
   console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
   console.log(swordsman.healthPoints); // 15
@@ -102,7 +146,7 @@
   console.log(archer.greet()); // Lilith offers a greeting in Elvish.
   console.log(mage.takeDamage()); // Bruce took damage.
   console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
-*/
+
 
   // Stretch task: 
   // * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.  
